@@ -94,7 +94,7 @@ app.get('/getBook/:id', function (req, exres){
               var lang;
               var size;
               var pages;
-    
+            
               bookName = $('.col-sm-11 h1').text().trim();
     
               count = 0;
@@ -134,6 +134,10 @@ app.get('/getBook/:id', function (req, exres){
                 }
     
             })
+
+            image = $('.bov-img img').map(function(){
+                return $(this).prop("src");
+              }).get(0);
     
               let bookInfo ={
                 bookName:bookName,
@@ -141,7 +145,8 @@ app.get('/getBook/:id', function (req, exres){
                 desc:desc,
                 publisher:publisher,
                 date:date,
-                pages:pages
+                pages:pages,
+                image:image
               };
     
               exres.json(bookInfo);
