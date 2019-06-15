@@ -74,4 +74,84 @@ app.get('/getBookId/:isbn', function(req,exres){
     })
 });
 
+app.get('/getBook/:id', function (req, exres){
+    var page = 'https://fidibo.com/book/{{bookId}}'
+    
+    page = page.replace('{{bookId}}',req.params.id);
+    
+    var c = new Crawler({
+      maxConnections: 10,
+      callback: function (error, res, done) {
+          if (error) {
+              console.log(error);
+          } else {
+              var $ = res.$;
+              var bookName;
+              var author;
+              var desc;
+              var publisher;
+              var date;
+              var lang;
+              var size;
+              var pages;
+    
+              bookName = $('.col-sm-11 h1').text().trim();
+    
+              count = 0;
+              $('.author_title').each(function(index){
+                  if(count == 0){
+                    author = $('a span',this).text().trim();
+                    count++;
+                  }  
+              })
+    
+              desc = $('.more-info').text().trim();
+    
+              $('.book-tags ul li').each(function(index){
+                if(count == 1){
+                  publisher = $(this).text().trim();
+                  count++;
+                }  
+    
+                else if(count == 2){
+                    date = $(this).text().trim();
+                    count ++;
+                }
+    
+                else if(count == 3){
+                    lang = $(this).text().trim();
+                    count ++;
+                }
+    
+                else if(count == 4){
+                    size = $(this).text().trim();
+                    count ++;
+                }
+    
+                else if(count == 5){
+                    pages = $(this).text().trim().replace(' صفحه','');
+                    count ++;
+                }
+    
+            })
+    
+              let bookInfo ={
+                bookName:bookName,
+                author:author,
+                desc:desc,
+                publisher:publisher,
+                date:date,
+                pages:pages
+              };
+    
+              exres.json(bookInfo);
+          }
+          done();
+      }
+    });
+    
+    c.queue(page);
+    
+    });
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
